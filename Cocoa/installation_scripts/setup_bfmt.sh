@@ -139,7 +139,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
   
   elif [ -n "${BFMT_GIT_BRANCH:-}" ]; then
   
-    "${GIT:?}" checkout -b "${BFMT_GIT_BRANCH:?}" "origin/${BFMT_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -B "${BFMT_GIT_BRANCH:?}" "origin/${BFMT_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   
   elif [ -n "${BFMT_GIT_TAG:-}" ]; then

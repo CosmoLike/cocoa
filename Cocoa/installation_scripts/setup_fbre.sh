@@ -127,7 +127,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
   elif [ -n "${FBRE_GIT_BRANCH:-}" ]; then
 
-    "${GIT:?}" checkout -b "${FBRE_GIT_BRANCH:?}" "origin/${FBRE_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -B "${FBRE_GIT_BRANCH:?}" "origin/${FBRE_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
 
   elif [ -n "${FBRE_GIT_TAG:-}" ]; then

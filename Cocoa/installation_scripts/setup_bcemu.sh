@@ -127,7 +127,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
 
   elif [ -n "${BCEMU_GIT_BRANCH:-}" ]; then
 
-    "${GIT:?}" checkout -b "${BCEMU_GIT_BRANCH:?}" "origin/${BCEMU_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -B "${BCEMU_GIT_BRANCH:?}" "origin/${BCEMU_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
 
   elif [ -n "${BCEMU_GIT_TAG:-}" ]; then

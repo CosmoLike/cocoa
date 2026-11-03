@@ -127,7 +127,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
   
   elif [ -n "${PYSPK_GIT_BRANCH:-}" ]; then
   
-    "${GIT:?}" checkout -b "${PYSPK_GIT_BRANCH:?}" "origin/${PYSPK_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -B "${PYSPK_GIT_BRANCH:?}" "origin/${PYSPK_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   
   elif [ -n "${PYSPK_GIT_TAG:-}" ]; then

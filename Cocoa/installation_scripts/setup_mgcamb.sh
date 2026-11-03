@@ -141,7 +141,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${MGCAMB_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${MGCAMB_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout -b "${MGCAMB_GIT_BRANCH:?}" "origin/${MGCAMB_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -B "${MGCAMB_GIT_BRANCH:?}" "origin/${MGCAMB_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${MGCAMB_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${MGCAMB_GIT_TAG:?}" -b "${MGCAMB_GIT_TAG:?}TMP" \

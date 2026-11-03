@@ -133,7 +133,7 @@ if [[ ! -d "${PACKDIR:?}" ]]; then
     "${GIT:?}" checkout "${SIMDE_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${SIMDE_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout -b "${SIMDE_GIT_BRANCH:?}" "origin/${SIMDE_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -B "${SIMDE_GIT_BRANCH:?}" "origin/${SIMDE_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${SIMDE_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${SIMDE_GIT_TAG:?}" -b "${SIMDE_GIT_TAG:?}TMP" \

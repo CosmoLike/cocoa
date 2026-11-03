@@ -145,7 +145,7 @@ if [ ! -d "${PACKDIR:?}" ]; then
     "${GIT:?}" checkout "${POLYCHORD_GIT_COMMIT:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${POLYCHORD_GIT_BRANCH:-}" ]; then
-    "${GIT:?}" checkout -b "${POLYCHORD_GIT_BRANCH:?}" "origin/${POLYCHORD_GIT_BRANCH:?}" \
+    "${GIT:?}" checkout -B "${POLYCHORD_GIT_BRANCH:?}" "origin/${POLYCHORD_GIT_BRANCH:?}" \
       >>${OUT1:?} 2>>${OUT2:?} || { error "${EC16:?}"; return 1; }
   elif [ -n "${POLYCHORD_GIT_TAG:-}" ]; then
     "${GIT:?}" checkout "tags/${POLYCHORD_GIT_TAG:?}" -b "${POLYCHORD_GIT_TAG:?}TMP" \
